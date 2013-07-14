@@ -164,8 +164,15 @@ extern "C" {
 #  define CV_CODEC(name) name
 #endif
 
+
 static int get_number_of_cpus(void)
 {
+    int amount = cv::getThreadNum();
+
+    if (amount > 0) {
+        return amount;
+    }
+
 #if LIBAVFORMAT_BUILD < CALC_FFMPEG_VERSION(52, 111, 0)
     return 1;
 #elif defined WIN32 || defined _WIN32
@@ -1638,6 +1645,7 @@ bool CvVideoWriter_FFMPEG::open( const char * filename, int fourcc,
     c->bit_rate = (int)lbit_rate;
 
     /* open the codec */
+    c->thread_count = get_number_of_cpus();
     if ((err=
 #if LIBAVCODEC_VERSION_INT >= ((53<<16)+(8<<8)+0)
          avcodec_open2(c, codec, NULL)

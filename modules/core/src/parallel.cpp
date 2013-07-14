@@ -338,8 +338,11 @@ int cv::getNumThreads(void)
 #endif
 }
 
+static int threads_amount = 0;
+
 void cv::setNumThreads( int threads )
 {
+    threads_amount = threads;
     (void)threads;
 #ifdef CV_PARALLEL_FRAMEWORK
     numThreads = threads;
@@ -394,7 +397,7 @@ int cv::getThreadNum(void)
     #if TBB_INTERFACE_VERSION >= 6100 && defined TBB_PREVIEW_TASK_ARENA && TBB_PREVIEW_TASK_ARENA
         return tbb::task_arena::current_slot();
     #else
-        return 0;
+        return threads_amount;
     #endif
 #elif defined HAVE_CSTRIPES
     return pix();
